@@ -1,18 +1,9 @@
 {
   "dependencies": {
-    "express": "^4.19.2",
+    "express": "^4.21.1",
+    "node-oracledb": "^1.0.2",
     "oracledb": "^6.6.0",
-    "sequelize": "^6.37.3"
-  },
-  "name": "fazbear",
-  "version": "1.0.0",
-  "main": "index.js",
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+    "sequelize": "^6.37.4",
+    "sequelize-oracle": "^3.3.2-0.0"
+  }
 }
