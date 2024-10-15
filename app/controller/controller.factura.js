@@ -160,44 +160,46 @@ exports.retrieveFacturasByCliente = async (req, res) => {
 */
 
 
-exports.retrieveFacturaWithDetails = async (req, res) => {
-    try {
-        const { noFactura, serieFactura } = req.params;
+exports.getDetallesByFactura = (req, res) => {
+    const { noFactura, serieFactura } = req.params;
 
-        // Verifica que noFactura sea un número si corresponde
-        if (isNaN(noFactura)) {
-            return res.status(400).json({
-                message: "El número de factura debe ser un valor numérico válido."
-            });
-        }
-
-        const factura = await Factura.findOne({
-            where: {
-                noFactura: Number(noFactura), // Convertir a número si es necesario
-                serieFactura: serieFactura     // Suponiendo que es una cadena
-            },
-            include: [{
-                model: db.DetalleFactura,
-                as: 'detalles'
-            }]
-        });
-
-        if (!factura) {
-            return res.status(404).json({
-                message: `Factura con número ${noFactura} y serie ${serieFactura} no encontrada.`
-            });
-        }
-
-        res.status(200).json({
-            message: `Factura con número ${noFactura} y serie ${serieFactura} obtenida exitosamente.`,
-            factura: factura
-        });
-
-    } catch (error) {
-        console.error("Error al obtener la factura:", error);
-        res.status(500).json({
-            message: "Error al obtener la factura",
-            error: error.message
+    // Validar que noFactura sea un número
+    if (isNaN(noFactura)) {
+        return res.status(400).json({
+            message: "El número de factura debe ser un valor numérico válido."
         });
     }
+
+    // Convertir el valor de noFactura a número
+    const noFacturaNumber = parseInt(noFactura, 10);
+
+    // Buscar registros en la tabla 'detalle_factura' con el número y serie de la factura
+    db.DetalleFactura.findAll({
+        where: {
+            noFactura: noFacturaNumber,
+            serieFactura: serieFactura
+        }
+    })
+    .then(detalleFacturas => {
+        if (detalleFacturas.length === 0) {
+            return res.status(404).json({
+                message: `No se encontraron detalles para la factura con número ${noFactura} y serie ${serieFactura}.`
+            });
+        }
+
+        // Retornar los detalles encontrados
+        res.status(200).json({
+            message: `Detalles de la factura con número ${noFactura} y serie ${serieFactura} obtenidos exitosamente.`,
+            detalles: detalleFacturas
+        });
+    })
+    .catch(error => {
+        // Manejar errores y mostrar un mensaje genérico
+        console.log(error);
+        res.status(500).json({
+            message: "Ocurrió un error al obtener los detalles de la factura.",
+            error: error.message
+        });
+    });
 };
+
